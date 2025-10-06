@@ -358,7 +358,7 @@ export default function AdminChatbotsPage() {
         }
 
       // Remover nós que não existem mais no ReactFlow
-      const reactFlowNodeIds = new Set(flow.nodes.map(n => n.id))
+      const reactFlowNodeIds = new Set(flow.nodes.map((n: { id: string }) => n.id))
       for (const existingNode of existingNodes) {
         if (!reactFlowNodeIds.has(existingNode.id)) {
           try {
