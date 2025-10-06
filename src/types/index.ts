@@ -126,6 +126,7 @@ export interface Chatbot extends BaseEntity {
   active: boolean
   companyId: string
   company?: Company
+  autoEndMessage?: string
   configuracao?: ChatbotConfig
 }
 
