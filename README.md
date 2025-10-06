@@ -117,4 +117,4 @@ vercel --prod
 - [Next.js](https://nextjs.org/docs)
 - [shadcn/ui](https://ui.shadcn.com/)
 - [Tailwind CSS](https://tailwindcss.com/docs)
-- [Zustand](https://zustand-demo.pmnd.rs/)
+- [Zustand](https://zustand-demo.pmnd.rs/)# boti-frontend
