@@ -105,7 +105,7 @@ export default function DisparosPage() {
     }
   }
 
-  const handleCreateDisparo = async (e) => {
+  const handleCreateDisparo = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     
     if (clientesSelecionados.length === 0) {
