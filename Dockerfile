@@ -11,7 +11,8 @@ WORKDIR /app
 # Copiar arquivos de dependências
 COPY package.json package-lock.json* ./
 # Instalar dependências completas (inclui dev) para permitir o build
-RUN npm ci --legacy-peer-deps
+# Tenta npm ci; se falhar (lock incompatível), faz fallback para npm install
+RUN sh -c "npm ci --legacy-peer-deps --no-audit --no-fund || npm install --legacy-peer-deps --no-audit --no-fund"
 
 # Rebuild do código fonte apenas quando necessário
 FROM base AS builder
