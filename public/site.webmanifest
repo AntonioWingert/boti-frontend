@@ -1,0 +1,40 @@
+{
+  "name": "Boti - Plataforma de Chatbots WhatsApp",
+  "short_name": "Boti",
+  "description": "Plataforma completa para criação e gerenciamento de chatbots WhatsApp",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F3F3F5",
+  "theme_color": "#5B4BFF",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["business", "productivity", "utilities"],
+  "lang": "pt-BR",
+  "dir": "ltr"
+}
