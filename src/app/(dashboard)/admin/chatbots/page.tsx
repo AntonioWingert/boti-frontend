@@ -33,7 +33,7 @@ export default function AdminChatbotsPage() {
   const [selectedChatbot, setSelectedChatbot] = useState<Chatbot | null>(null)
   const [showFlowEditor, setShowFlowEditor] = useState(false)
   const [flowData, setFlowData] = useState<any>(null)
-  const [flowId, setFlowId] = useState<string | null>(null)
+  const [flowId, setFlowId] = useState<string | undefined>(undefined)
 
   useEffect(() => {
     fetchChatbots()
@@ -188,6 +188,7 @@ export default function AdminChatbotsPage() {
     setShowFlowEditor(false)
     setSelectedChatbot(null)
     setFlowData(null)
+    setFlowId(undefined)
   }
 
   const handleFlowEditorSave = async (flow: any) => {
