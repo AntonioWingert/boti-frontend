@@ -241,8 +241,6 @@ export default function ChatbotDetailPage() {
           <h1 className="text-2xl font-bold text-boti-text">Editor de Fluxo - {chatbot.name}</h1>
         </div>
         <FlowEditor
-          chatbotId={chatbotId}
-          initialData={flowData}
           flowData={flowData}
           onSave={() => {
             setShowFlowEditor(false)
