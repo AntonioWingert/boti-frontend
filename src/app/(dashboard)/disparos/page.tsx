@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import type { FormEvent, ChangeEvent } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -106,7 +107,7 @@ export default function DisparosPage() {
     }
   }
 
-  const handleCreateDisparo = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleCreateDisparo = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     
     if (clientesSelecionados.length === 0) {
@@ -160,7 +161,7 @@ export default function DisparosPage() {
     }
   }
 
-  const handleSendDisparo = async (disparoId) => {
+  const handleSendDisparo = async (disparoId: string) => {
     try {
       await api.post(`/disparos/${disparoId}/send`)
       fetchDisparos()
@@ -171,7 +172,7 @@ export default function DisparosPage() {
     }
   }
 
-  const handleCancelDisparo = async (disparoId) => {
+  const handleCancelDisparo = async (disparoId: string) => {
     try {
       await api.post(`/disparos/${disparoId}/cancel`)
       fetchDisparos()
@@ -181,7 +182,7 @@ export default function DisparosPage() {
     }
   }
 
-  const handleFileUpload = async (event) => {
+  const handleFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files)
     
     try {
@@ -218,7 +219,7 @@ export default function DisparosPage() {
     }
   }
 
-  const removeAnexo = async (anexoId) => {
+  const removeAnexo = async (anexoId: number) => {
     const anexo = formData.attachments.find(a => a.id === anexoId)
     
     if (anexo && anexo.key) {
@@ -236,7 +237,7 @@ export default function DisparosPage() {
     })
   }
 
-  const formatFileSize = (bytes) => {
+  const formatFileSize = (bytes: number) => {
     if (bytes === 0) return '0 Bytes'
     const k = 1024
     const sizes = ['Bytes', 'KB', 'MB', 'GB']
