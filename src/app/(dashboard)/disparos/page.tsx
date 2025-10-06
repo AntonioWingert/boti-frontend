@@ -183,7 +183,9 @@ export default function DisparosPage() {
   }
 
   const handleFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(event.target.files)
+    const fileList = event.target.files
+    if (!fileList || fileList.length === 0) return
+    const files = Array.from(fileList)
     
     try {
       // Upload dos arquivos para o servidor
