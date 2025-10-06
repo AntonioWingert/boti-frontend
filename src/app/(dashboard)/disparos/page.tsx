@@ -25,6 +25,7 @@ import {
   X
 } from 'lucide-react'
 import { useAuth } from '@/hooks/use-auth'
+import type { Client } from '@/types'
 import { api } from '@/lib/api'
 
 const disparoTipos = [
@@ -57,8 +58,8 @@ export default function DisparosPage() {
   const [usage, setUsage] = useState(null)
   const [loading, setLoading] = useState(true)
   const [showCreateModal, setShowCreateModal] = useState(false)
-  const [clientes, setClientes] = useState([])
-  const [clientesSelecionados, setClientesSelecionados] = useState([])
+  const [clientes, setClientes] = useState<Client[]>([])
+  const [clientesSelecionados, setClientesSelecionados] = useState<Client[]>([])
   const [formData, setFormData] = useState({
     title: '',
     message: '',
