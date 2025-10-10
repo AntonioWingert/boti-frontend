@@ -37,5 +37,5 @@ export async function qrStringToBase64(qrString: string): Promise<string> {
  * Verifica se uma string é um QR Code válido
  */
 export function isValidQRCode(qrString: string): boolean {
-  return qrString && qrString.length > 0;
+  return Boolean(qrString && qrString.length > 0);
 }

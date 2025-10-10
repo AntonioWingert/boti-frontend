@@ -269,7 +269,7 @@ interface FlowEditorProps {
 
 export function FlowEditor({ initialFlow, flowId, flowData, onSave, onClose }: FlowEditorProps) {
   // Configurações de grid para alinhamento
-  const snapGrid = [20, 20]
+  const snapGrid: [number, number] = [20, 20]
   const defaultViewport = { x: -200, y: -100, zoom: 0.8 }
   const { isMobile } = useMobileDetection()
 
@@ -289,10 +289,10 @@ export function FlowEditor({ initialFlow, flowId, flowData, onSave, onClose }: F
         // Usar o tipo já mapeado no page.tsx ou mapear novamente
         if (node.type) {
           nodeType = node.type
-        } else if (node.data?.nodeType === 'MESSAGE') {
-          nodeType = node.data?.isStart ? 'start' : 
-                     node.data?.isEnd ? 'end' : 'message'
-        } else if (node.data?.nodeType === 'OPTION') {
+        } else if ((node as any).data?.nodeType === 'MESSAGE') {
+          nodeType = (node as any).data?.isStart ? 'start' : 
+                     (node as any).data?.isEnd ? 'end' : 'message'
+        } else if ((node as any).data?.nodeType === 'OPTION') {
           nodeType = 'choice'
         }
 
@@ -301,12 +301,12 @@ export function FlowEditor({ initialFlow, flowId, flowData, onSave, onClose }: F
           type: nodeType,
           position: node.position,
           data: {
-            label: node.data?.label || node.title,
-            message: node.data?.message || node.message,
+            label: (node as any).data?.label || node.title,
+            message: (node as any).data?.message || node.message,
             realId: node.id, // Armazenar ID real
-            options: node.data?.options || node.options || [],
-            ...(node.data?.nodeType === 'OPTION' && { 
-              options: (node.data?.options || node.options)?.map((opt: any) => ({
+            options: (node as any).data?.options || node.options || [],
+            ...((node as any).data?.nodeType === 'OPTION' && { 
+              options: ((node as any).data?.options || node.options)?.map((opt: any) => ({
                 id: opt.id,
                 text: opt.text,
                 targetNodeId: opt.targetNodeId
@@ -315,18 +315,18 @@ export function FlowEditor({ initialFlow, flowId, flowData, onSave, onClose }: F
           },
           // Posicionamento de handles baseado no tipo
           ...(nodeType === 'start' && { 
-            sourcePosition: 'bottom'
+            sourcePosition: Position.Bottom
           }),
           ...(nodeType === 'message' && { 
-            sourcePosition: 'bottom',
-            targetPosition: 'top'
+            sourcePosition: Position.Bottom,
+            targetPosition: Position.Top
           }),
           ...(nodeType === 'choice' && { 
-            sourcePosition: 'bottom',
-            targetPosition: 'top'
+            sourcePosition: Position.Bottom,
+            targetPosition: Position.Top
           }),
           ...(nodeType === 'end' && { 
-            targetPosition: 'top'
+            targetPosition: Position.Top
           })
         }
       })
@@ -339,8 +339,8 @@ export function FlowEditor({ initialFlow, flowId, flowData, onSave, onClose }: F
     }
   }, [flowId, flowData])
   
-  const [nodes, setNodes, onNodesChange] = useNodesState([])
-  const [edges, setEdges, onEdgesChange] = useEdgesState([])
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node>([])
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([])
 
   // Salvar posições automaticamente quando nós são movidos
   const handleNodesChange = useCallback((changes: any[]) => {
@@ -356,10 +356,10 @@ export function FlowEditor({ initialFlow, flowId, flowData, onSave, onClose }: F
       positionChanges.forEach(change => {
         if (change.id && change.position) {
           // Buscar o nó para obter o ID real
-          const node = nodes.find((n: any) => n.id === change.id)
+          const node = nodes.find((n: any) => n.id === change.id) as any
           if (node?.data?.realId && flowId) {
             // Salvar posição no banco usando ID real
-            api.put(`/flows/${flowId}/nodes/${node.data.realId}`, {
+            api.put(`/flows/${flowId}/nodes/${(node as any).data.realId}`, {
               position: change.position
             }).catch(error => {
               console.error('❌ Erro ao salvar posição:', error)
@@ -423,8 +423,8 @@ export function FlowEditor({ initialFlow, flowId, flowData, onSave, onClose }: F
       }
 
       // Usar IDs reais do banco se disponíveis
-      const realSourceId = sourceNode.data?.realId || sourceId
-      const realTargetId = targetNode.data?.realId || targetId
+      const realSourceId = (sourceNode as any).data?.realId || sourceId
+      const realTargetId = (targetNode as any).data?.realId || targetId
 
       const response = await api.post(`/flows/${flowId}/connections`, {
         sourceNodeId: realSourceId,
@@ -446,8 +446,8 @@ export function FlowEditor({ initialFlow, flowId, flowData, onSave, onClose }: F
         // Atualizar o nó de origem para incluir o targetNodeId na opção
         setNodes((nds: Node[]) => 
           nds.map((node: Node) => {
-            if (node.id === params.source && node.data.options) {
-              const newOptions = [...node.data.options]
+            if (node.id === params.source && (node as any).data.options) {       
+              const newOptions = [...(node as any).data.options]
               if (newOptions[optionIndex]) {
                 newOptions[optionIndex] = {
                   ...newOptions[optionIndex],
@@ -476,9 +476,7 @@ export function FlowEditor({ initialFlow, flowId, flowData, onSave, onClose }: F
             fill: 'white',
             fillOpacity: 0.8,
             stroke: '#f59e0b',
-            strokeWidth: 1,
-            rx: 4,
-            ry: 4
+            strokeWidth: 1
           },
           labelBgPadding: [4, 8],
           labelBgBorderRadius: 4
@@ -653,20 +651,20 @@ export function FlowEditor({ initialFlow, flowId, flowData, onSave, onClose }: F
         ...(type === 'end' && { message: 'Obrigado! Até logo!' }),
       },
       // Posicionamento de handles baseado no tipo
-      ...(type === 'start' && { sourcePosition: 'bottom' }),
+      ...(type === 'start' && { sourcePosition: Position.Bottom }),
       ...(type === 'message' && { 
-        sourcePosition: 'bottom',
-        targetPosition: 'top'
+        sourcePosition: Position.Bottom,
+        targetPosition: Position.Top
       }),
       ...(type === 'choice' && { 
-        sourcePosition: 'bottom',
-        targetPosition: 'top'
+        sourcePosition: Position.Bottom,
+        targetPosition: Position.Top
       }),
       ...(type === 'action' && { 
-        sourcePosition: 'bottom',
-        targetPosition: 'top'
+        sourcePosition: Position.Bottom,
+        targetPosition: Position.Top
       }),
-      ...(type === 'end' && { targetPosition: 'top' }),
+      ...(type === 'end' && { targetPosition: Position.Top }),
     }
 
     setNodes((nds: Node[]) => [...nds, newNode])
@@ -697,8 +695,8 @@ export function FlowEditor({ initialFlow, flowId, flowData, onSave, onClose }: F
         
         // Preparar dados do nó para o banco
         const nodeData = {
-          title: newNode.data.label,
-          message: newNode.data.message || newNode.data.label,
+          title: (newNode.data as any).label,
+          message: (newNode.data as any).message || (newNode.data as any).label,
           nodeType: type === 'start' ? 'MESSAGE' : 
                    type === 'message' ? 'MESSAGE' :
                    type === 'choice' ? 'OPTION' :
@@ -727,10 +725,10 @@ export function FlowEditor({ initialFlow, flowId, flowData, onSave, onClose }: F
         )
         
         // Se é um nó de escolha, criar opções padrão
-        if (type === 'choice' && newNode.data.options && newNode.data.options.length > 0) {
-          console.log('📋 Criando opções para nó de escolha:', newNode.data.options)
+        if (type === 'choice' && (newNode.data as any).options && (newNode.data as any).options.length > 0) {
+          console.log('📋 Criando opções para nó de escolha:', (newNode.data as any).options)
           
-          for (const option of newNode.data.options) {
+          for (const option of (newNode.data as any).options) {
             try {
               const optionResponse = await api.post(`/flows/nodes/${response.data.id}/options`, {
                 text: option.text || option.label || '',
@@ -780,10 +778,10 @@ export function FlowEditor({ initialFlow, flowId, flowData, onSave, onClose }: F
       console.log('💾 Salvando nó automaticamente no backend:', updatedNode.id)
       
       // Salvar dados do nó no backend
-      if (flowId && updatedNode.data?.realId) {
+      if (flowId && (updatedNode as any).data?.realId) {
         const nodeData = {
-          title: updatedNode.data.label,
-          message: updatedNode.data.message,
+          title: (updatedNode as any).data.label,
+          message: (updatedNode as any).data.message,
           nodeType: updatedNode.type === 'start' ? 'MESSAGE' :
                    updatedNode.type === 'end' ? 'MESSAGE' :
                    updatedNode.type === 'choice' ? 'OPTION' : 'MESSAGE',
@@ -793,19 +791,19 @@ export function FlowEditor({ initialFlow, flowId, flowData, onSave, onClose }: F
         }
         
         console.log('📤 Enviando dados do nó:', nodeData)
-        await api.put(`/flows/${flowId}/nodes/${updatedNode.data.realId}`, nodeData)
+        await api.put(`/flows/${flowId}/nodes/${(updatedNode as any).data.realId}`, nodeData)
         console.log('✅ Nó salvo no backend com sucesso')
         
         // Salvar opções se existirem
-        if (updatedNode.data.options && updatedNode.data.options.length > 0) {
-          console.log('📋 Salvando opções do nó:', updatedNode.data.options.length)
+        if ((updatedNode as any).data.options && (updatedNode as any).data.options.length > 0) {
+          console.log('📋 Salvando opções do nó:', (updatedNode as any).data.options.length)
           
-          for (const option of updatedNode.data.options) {
+          for (const option of (updatedNode as any).data.options) {
             try {
               if (option.id && option.id.startsWith('option_')) {
                 // Criar nova opção
                 console.log('➕ Criando nova opção:', option.text)
-                const response = await api.post(`/flows/nodes/${updatedNode.data.realId}/options`, {
+                const response = await api.post(`/flows/nodes/${(updatedNode as any).data.realId}/options`, {
                   text: option.text,
                   targetNodeId: option.targetNodeId || null
                 })
@@ -1015,7 +1013,7 @@ export function FlowEditor({ initialFlow, flowId, flowData, onSave, onClose }: F
           {selectedNode && (
             <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-xl">
               <h4 className="font-bold text-blue-900 mb-2">Nó Selecionado</h4>
-              <p className="text-sm text-blue-700 mb-3">{selectedNode.data.label}</p>
+              <p className="text-sm text-blue-700 mb-3">{(selectedNode as any).data.label}</p>
               <div className="space-y-2">
                 <Button 
                   onClick={() => setShowNodeEditor(true)}
@@ -1026,7 +1024,7 @@ export function FlowEditor({ initialFlow, flowId, flowData, onSave, onClose }: F
                 </Button>
                 <Button 
                   onClick={() => {
-                    if (confirm(`Tem certeza que deseja excluir o nó "${selectedNode.data.label}"?`)) {
+                    if (confirm(`Tem certeza que deseja excluir o nó "${(selectedNode as any).data.label}"?`)) {
                       setNodes((nds: Node[]) => nds.filter((node: Node) => node.id !== selectedNode.id))
                       setEdges((eds: Edge[]) => eds.filter((edge: Edge) => 
                         edge.source !== selectedNode.id && edge.target !== selectedNode.id
@@ -1066,7 +1064,6 @@ export function FlowEditor({ initialFlow, flowId, flowData, onSave, onClose }: F
               nodesConnectable={true}
               elementsSelectable={true}
               selectNodesOnDrag={false}
-              connectionMode="loose"
               deleteKeyCode={null}
               multiSelectionKeyCode="Control"
               panOnDrag={true}
@@ -1162,8 +1159,8 @@ function NodeEditor({ node, onSave, onClose, onDelete, allNodes = [] }: {
   allNodes?: Node[];
 }) {
   const [nodeData, setNodeData] = useState({
-    ...node.data,
-    options: node.data.options?.map((opt: any) => ({
+    ...(node as any).data,
+    options: (node as any).data.options?.map((opt: any) => ({
       id: opt.id || `option_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       text: opt.text || opt.label || '',
       label: opt.text || opt.label || '',
@@ -1295,7 +1292,7 @@ function NodeEditor({ node, onSave, onClose, onDelete, allNodes = [] }: {
                         <div className="flex items-center space-x-2 p-2 bg-green-50 border border-green-200 rounded-md">
                           <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                           <span className="text-xs text-green-700">
-                            Conectado ao nó: {allNodes.find(n => n.id === option.targetNodeId)?.data?.label || option.targetNodeId}
+                            Conectado ao nó: {allNodes.find(n => n.id === option.targetNodeId) ? (allNodes.find(n => n.id === option.targetNodeId) as any)?.data?.label : option.targetNodeId}
                           </span>
                         </div>
                       ) : (
@@ -1351,7 +1348,7 @@ function NodeEditor({ node, onSave, onClose, onDelete, allNodes = [] }: {
                           <span className="text-blue-600">→</span>
                           {targetInfo ? (
                             <span className="text-blue-600">
-                              {targetInfo.data.label || targetInfo.type}
+                              {(targetInfo as any).data?.label || targetInfo.type}
                             </span>
                           ) : (
                             <span className="text-yellow-600">
@@ -1413,7 +1410,7 @@ function NodeEditor({ node, onSave, onClose, onDelete, allNodes = [] }: {
             </Button>
             <Button 
               onClick={() => {
-                if (confirm(`Tem certeza que deseja excluir o nó "${node.data.label}"?`)) {
+                if (confirm(`Tem certeza que deseja excluir o nó "${(node as any).data.label}"?`)) {
                   onDelete?.(node.id)
                   onClose()
                 }

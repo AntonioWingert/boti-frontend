@@ -23,6 +23,24 @@ import {
 import { useAuth } from '@/hooks/use-auth'
 import { api } from '@/lib/api'
 
+interface CurrentPlan {
+  planType: string
+  daysLeft?: number
+}
+
+interface UsageData {
+  currentUsers: number
+  maxUsers: number
+  currentDisparos: number
+  maxDisparos: number
+  currentDisparosDiarios: number
+  maxDisparosDiarios: number
+  currentConnections: number
+  maxConnections: number
+  currentChatbots: number
+  maxChatbots: number
+}
+
 const plans = [
   {
     name: 'STARTER',
@@ -103,8 +121,8 @@ const premiumFeatures = [
 
 export default function UpgradePage() {
   const { user } = useAuth()
-  const [currentPlan, setCurrentPlan] = useState(null)
-  const [usage, setUsage] = useState(null)
+  const [currentPlan, setCurrentPlan] = useState<CurrentPlan | null>(null)
+  const [usage, setUsage] = useState<UsageData | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -132,7 +150,7 @@ export default function UpgradePage() {
     }
   }
 
-  const handleUpgrade = async (planName) => {
+  const handleUpgrade = async (planName: string) => {
     try {
       await api.post('/companies/upgrade', { planType: planName })
       alert('Upgrade realizado com sucesso!')

@@ -29,6 +29,39 @@ import { useAuth } from '@/hooks/use-auth'
 import type { Client } from '@/types'
 import { api } from '@/lib/api'
 
+interface Attachment {
+  id: number
+  name: string
+  size: number
+  type: string
+  url: string
+  key: string
+  preview: string | null
+}
+
+interface UsageData {
+  currentDisparos: number
+  maxDisparos: number
+  currentDisparosDiarios: number
+  maxDisparosDiarios: number
+}
+
+interface Disparo {
+  id: string
+  titulo: string
+  message: string
+  tipo: string
+  status: 'AGENDADO' | 'ENVIANDO' | 'CONCLUIDO' | 'CANCELADO' | 'ERRO'
+  agendadoPara: string
+  destinatarios: Array<{
+    clientId: string
+    phone: string
+    name: string
+  }>
+  sendInterval: number
+  attachments: Attachment[]
+}
+
 const disparoTipos = [
   { value: 'PROMOCIONAL', label: 'Promocional' },
   { value: 'LEMBRETE', label: 'Lembrete' },
@@ -55,8 +88,8 @@ const statusIcons = {
 
 export default function DisparosPage() {
   const { user } = useAuth()
-  const [disparos, setDisparos] = useState([])
-  const [usage, setUsage] = useState(null)
+  const [disparos, setDisparos] = useState<Disparo[]>([])
+  const [usage, setUsage] = useState<UsageData | null>(null)
   const [loading, setLoading] = useState(true)
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [clientes, setClientes] = useState<Client[]>([])
@@ -69,7 +102,7 @@ export default function DisparosPage() {
     recipients: [],
     sendInterval: 5, // segundos entre envios
     selectedClients: [],
-    attachments: []
+    attachments: [] as Attachment[]
   })
 
   useEffect(() => {
@@ -190,11 +223,11 @@ export default function DisparosPage() {
     try {
       // Upload dos arquivos para o servidor
       const uploadPromises = files.map(async (file) => {
-        const formData = new FormData()
-        formData.append('file', file)
-        formData.append('path', 'disparos')
+        const uploadFormData = new FormData()
+        uploadFormData.append('file', file)
+        uploadFormData.append('path', 'disparos')
         
-        const response = await api.post('/storage/upload', formData, {
+        const response = await api.post('/storage/upload', uploadFormData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         })
         
@@ -209,12 +242,12 @@ export default function DisparosPage() {
         }
       })
       
-      const uploadedFiles = await Promise.all(uploadPromises)
+      const uploadedFiles: Attachment[] = await Promise.all(uploadPromises)
       
-      setFormData({
-        ...formData,
-        attachments: [...formData.attachments, ...uploadedFiles]
-      })
+      setFormData((prev) => ({
+        ...prev,
+        attachments: [...prev.attachments, ...uploadedFiles]
+      }))
     } catch (error) {
       console.error('Erro ao fazer upload dos arquivos:', error)
       alert('Erro ao fazer upload dos arquivos')

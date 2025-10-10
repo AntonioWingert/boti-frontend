@@ -123,7 +123,7 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-boti-bg">
-      <Header onMenuClick={() => setIsMenuOpen(!isMenuOpen)} />
+      <Header />
       
       {/* Hero Section */}
       <section className="relative py-20 px-4 lg:px-6">

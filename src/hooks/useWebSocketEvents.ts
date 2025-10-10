@@ -78,7 +78,6 @@ export function useWebSocketEvents(): UseWebSocketEventsReturn {
       reconnectionAttempts: 3, // Reduzir tentativas
       reconnectionDelay: 2000, // Aumentar delay entre tentativas
       reconnectionDelayMax: 10000, // Máximo delay
-      maxReconnectionAttempts: 3, // Máximo de tentativas
     });
 
     newSocket.on('connect', () => {

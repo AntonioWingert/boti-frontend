@@ -1,6 +1,6 @@
 import { useAuthStore } from '@/stores/auth'
 import { api } from '@/lib/api'
-import { LoginDto, CreateUserDto, AuthResponse } from '@/types'
+import { LoginDto, CreateUserDto, AuthResponse, User } from '@/types'
 
 export const useAuth = () => {
   const {
